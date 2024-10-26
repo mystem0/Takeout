@@ -37,7 +37,7 @@ public class EmployeeController {
      * @return
      */
     @PostMapping("/login")
-    public R<Employee> login(HttpServletRequest request, @RequestBody Employee employee) {
+    public R<Long> login(HttpServletRequest request, @RequestBody Employee employee) {
 
         //1、将页面提交的密码password进行md5加密处理
         String password = employee.getPassword();
@@ -59,9 +59,10 @@ public class EmployeeController {
         if (emp.getStatus() == 0) {
             return R.error("员工已被开除");
         }
-        //6、登录成功，将员工id存入Session并返回登录成功结果
+        //6、登录成功，将员工id存入Session
         request.getSession().setAttribute("employee", emp.getId());
-        return R.success(emp);
+        //7、返回登录成功结果和当前登录员工的id
+        return R.success(emp.getId());
     }
 
     /**
