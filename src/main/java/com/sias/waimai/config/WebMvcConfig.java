@@ -16,6 +16,10 @@ public class WebMvcConfig extends WebMvcConfigurationSupport {
     @Override
     protected void addResourceHandlers(ResourceHandlerRegistry registry) {
         log.info("开始进行静态资源映射...");
+/**
+ *         /backend/**   指代的是浏览器访问路径  localhost：8080\backend\**
+ *         classpath:/backend/   指代的是本地文件夹 resources\backend\
+ */
         registry.addResourceHandler("/backend/**").addResourceLocations("classpath:/backend/");
         registry.addResourceHandler("/front/**").addResourceLocations("classpath:/front/");
     }

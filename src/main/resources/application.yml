@@ -2,7 +2,7 @@ server:
   port: 8080
 spring:
   application:
-    #应用名称 , 可选
+    #应用名称 , 可写可不写
     name: waimai
   datasource:
     druid:

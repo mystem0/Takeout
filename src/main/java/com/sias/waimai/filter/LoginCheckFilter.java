@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 /**
- *      拦截器
+ *      过滤器
  * 检查用户是否已经完成登录
  */
 @WebFilter(filterName = "loginCheckFilter",urlPatterns = "/*")

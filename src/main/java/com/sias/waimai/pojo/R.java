@@ -11,13 +11,14 @@ public class R<T> {
     private String msg; //错误信息
     private T data; //数据
     private Map map = new HashMap(); //动态数据
-
+    //    静态方法：请求成功
     public static <T> R<T> success(T object) {
         R<T> r = new R<T>();
         r.data = object;
         r.code = 1;
         return r;
     }
+    //    静态方法：请求失败
     public static <T> R<T> error(String msg) {
         R r = new R();
         r.msg = msg;
