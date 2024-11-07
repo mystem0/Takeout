@@ -1,6 +1,7 @@
 package com.sias.waimai.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.sias.waimai.pojo.Employee;
 import com.sias.waimai.pojo.R;
@@ -37,7 +38,7 @@ public class EmployeeController {
      * @return
      */
     @PostMapping("/login")
-    public R<Long> login(HttpServletRequest request, @RequestBody Employee employee) {
+    public R<Employee> login(HttpServletRequest request, @RequestBody Employee employee) {
 
         //1、将页面提交的密码password进行md5加密处理
         String password = employee.getPassword();
@@ -62,7 +63,7 @@ public class EmployeeController {
         //6、登录成功，将员工id存入Session
         request.getSession().setAttribute("employee", emp.getId());
         //7、返回登录成功结果和当前登录员工的id
-        return R.success(emp.getId());
+        return R.success(emp);
     }
 
     /**
@@ -95,13 +96,15 @@ public class EmployeeController {
         log.info("新增员工的信息：{}", employee.toString());
         //设置初始密码123456，需要进行md5加密处理
         employee.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes()));
-        //设置员工创建时间和更新时间
-//        employee.setCreateTime(LocalDateTime.now());
-//        employee.setUpdateTime(LocalDateTime.now());
-        //获得当前登录用户的id
-//        Long empId = (Long) request.getSession().getAttribute("employee");
-//        employee.setCreateUser(empId);
-//        employee.setUpdateUser(empId);
+/*      原逻辑代码块迁徙至MyMetaObjecthandler.java中
+        // 设置员工创建时间和更新时间
+        employee.setCreateTime(LocalDateTime.now());
+        employee.setUpdateTime(LocalDateTime.now());
+        // 获得当前登录用户的id
+        Long empId = (Long) request.getSession().getAttribute("employee");
+        employee.setCreateUser(empId);
+        employee.setUpdateUser(empId);
+*/
         employeeService.save(employee);
         R<String> r = R.success("添加成功");
         return r;
@@ -121,7 +124,7 @@ public class EmployeeController {
         //构造分页器
         Page page1 = new Page(page, pageSize);
         //构造条件构造器
-        LambdaQueryWrapper<Employee> lambdaQueryWrapper = new LambdaQueryWrapper();
+        LambdaQueryWrapper<Employee> lambdaQueryWrapper = new LambdaQueryWrapper<>();
         lambdaQueryWrapper.like(StringUtils.isNotEmpty(name), Employee::getName, name);
         //排序
         lambdaQueryWrapper.orderByDesc(Employee::getUpdateTime);
@@ -135,7 +138,7 @@ public class EmployeeController {
      *
      * @param request
      * @param employee
-     * @return
+     * @return R<String>
      */
     @PutMapping
     public R<String> update(HttpServletRequest request, @RequestBody Employee employee) {
@@ -149,8 +152,8 @@ public class EmployeeController {
 
     /**
      * 修改信息前，根据id查员工信息
-     * 可直接保存修改，因为上面已经写好了修改状态时已经写好了更新方法，这两个操作共同调用了add.html，此时复用了update方法
-     *
+     * 可直接保存修改，因为上面已经写好了修改状态时已经写好了更新方法，这两个操作共同调用了add.html，此时复用了update方法。<br>
+     * &#064;PathVariable  代表路径参数，也就是说id这个变量在整个路径里面传递，所以可直接用@PathVariable接收
      * @param id
      * @return
      */

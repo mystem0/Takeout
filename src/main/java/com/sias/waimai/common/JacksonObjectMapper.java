@@ -25,9 +25,10 @@ import static com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKN
  * 从Java对象生成JSON的过程称为 [序列化Java对象到JSON]
  */
 public class JacksonObjectMapper extends ObjectMapper {
-    public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";
-    public static final String DEFAULT_DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";
-    public static final String DEFAULT_TIME_FORMAT = "HH:mm:ss";
+    public static final String DEFAULT_DATE_FORMAT = "yyyy-MM-dd";//    指定默认日期格式
+    public static final String DEFAULT_DATE_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss";//    指定默认日期时间格式
+    public static final String DEFAULT_TIME_FORMAT = "HH:mm:ss";//    指定默认时间格式
+//    无参构造方法
     public JacksonObjectMapper() {
         super();
         //收到未知属性时不报异常
@@ -36,13 +37,13 @@ public class JacksonObjectMapper extends ObjectMapper {
         this.getDeserializationConfig().withoutFeatures(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
         SimpleModule simpleModule = new SimpleModule()
+//                添加反序列化器，使用pattern对日期格式化
                 .addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_FORMAT)))
                 .addDeserializer(LocalDate.class, new LocalDateDeserializer(DateTimeFormatter.ofPattern(DEFAULT_DATE_FORMAT)))
                 .addDeserializer(LocalTime.class, new LocalTimeDeserializer(DateTimeFormatter.ofPattern(DEFAULT_TIME_FORMAT)))
-
+//                添加序列化器，使用ToStringSerializer
                 .addSerializer(BigInteger.class, ToStringSerializer.instance)
                 .addSerializer(Long.class, ToStringSerializer.instance)
-
                 .addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(DateTimeFormatter.ofPattern(DEFAULT_DATE_TIME_FORMAT)))
                 .addSerializer(LocalDate.class, new LocalDateSerializer(DateTimeFormatter.ofPattern(DEFAULT_DATE_FORMAT)))
                 .addSerializer(LocalTime.class, new LocalTimeSerializer(DateTimeFormatter.ofPattern(DEFAULT_TIME_FORMAT)));
