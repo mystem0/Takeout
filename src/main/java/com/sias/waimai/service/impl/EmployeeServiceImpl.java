@@ -1,5 +1,6 @@
 package com.sias.waimai.service.impl;
 
+import com.sias.waimai.common.CustomException;
 import com.sias.waimai.pojo.Employee;
 import com.sias.waimai.mapper.EmployeeMapper;
 import com.sias.waimai.service.EmployeeService;
@@ -17,4 +18,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> implements EmployeeService {
 
+    @Override
+    public String getName(Integer uid) {
+        if (uid == null){
+            throw new CustomException("用户未登录");
+        }
+        return baseMapper.getName(uid);
+    }
 }

@@ -1,7 +1,6 @@
 package com.sias.waimai.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.sias.waimai.pojo.Employee;
 import com.sias.waimai.pojo.R;
@@ -13,7 +12,6 @@ import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
 
 /**
  * 员工信息 前端控制器
@@ -38,7 +36,7 @@ public class EmployeeController {
      * @return
      */
     @PostMapping("/login")
-    public R<Employee> login(HttpServletRequest request, @RequestBody Employee employee) {
+    public R<Long> login(HttpServletRequest request, @RequestBody Employee employee) {
 
         //1、将页面提交的密码password进行md5加密处理
         String password = employee.getPassword();
@@ -63,9 +61,18 @@ public class EmployeeController {
         //6、登录成功，将员工id存入Session
         request.getSession().setAttribute("employee", emp.getId());
         //7、返回登录成功结果和当前登录员工的id
-        return R.success(emp);
+        return R.success(emp.getId());
     }
 
+    @GetMapping("/getInfo")
+    public R<String> getInfo(@RequestParam String uid){
+        log.info(uid);
+        // 去除双引号
+        uid = uid.replace("\"", "");
+        int id = Integer.parseInt(uid);
+        String name = employeeService.getName(id);
+        return R.success(name);
+    }
     /**
      * 退出
      * 'url': '/employee/logout',

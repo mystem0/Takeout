@@ -79,7 +79,7 @@
               <span>{{headTitle}}</span>
             </div>
             <div class="right-menu">
-              <div class="avatar-wrapper">{{ userInfo.name }}</div>
+              <div class="avatar-wrapper">{{ Infoname }}</div>
               <!-- <div class="logout" @click="logout">退出</div> -->
               <img src="images/icons/btn_close@2x.png" class="outLogin" alt="退出" @click="logout" />
             </div>
@@ -109,6 +109,15 @@
     <script src="js/request.js"></script>
     <script src="api/login.js"></script>
     <script>
+      function getUserInfoApi(params) {
+        return $axios({
+          'url': '/employee/getInfo',
+          'method': 'get',
+          params
+        })
+      }
+    </script>
+    <script>
 
       new Vue({
         el: '#app',
@@ -117,6 +126,7 @@
             defAct: '2',
             menuActived: '2',
             userInfo: {},
+            Infoname: '',
             menuList: [
               // {
               //   id: '1',
@@ -164,10 +174,15 @@
         },
         computed: {},
         created() {
-          const userInfo = window.localStorage.getItem('userInfo')
-          if (userInfo) {
-            this.userInfo = JSON.parse(userInfo)
-          }
+          // 视频原代码
+          // const userInfo = window.localStorage.getItem('userInfo')
+          // if (userInfo) {
+          //   this.userInfo = JSON.parse(userInfo)
+          // }
+          // this.closeLoading()
+
+          //修改后代码
+          this.getInfo()
           this.closeLoading()
         },
         beforeDestroy() {
@@ -178,6 +193,28 @@
           window.menuHandle = this.menuHandle
         },
         methods: {
+          async getInfo(){
+            const userId = window.localStorage.getItem('userInfo')
+            console.log('String userId', userId)
+            if (userId === null){
+              window.location.href = '/backend/page/login/login.html'
+            }else {
+              const params = {
+                uid: userId
+              }
+              await getUserInfoApi(params).then(res => {
+                console.log('res', res)
+                if (String(res.code) === "1") {
+                  this.Infoname = res.data
+                } else {
+                  this.$message.error('获取用户信息失败')
+                }
+              }).catch(error => {
+                if (Infoname !== '')
+                  alert("获取信息出现错误")
+              });
+            }
+          },
           logout() {
             logoutApi().then((res)=>{
               if(res.code === 1){
