@@ -19,10 +19,10 @@ import org.springframework.stereotype.Service;
 public class EmployeeServiceImpl extends ServiceImpl<EmployeeMapper, Employee> implements EmployeeService {
 
     @Override
-    public String getName(Integer uid) {
-        if (uid == null){
-            throw new CustomException("用户未登录");
+    public Employee getSomeInfo(Long id) {
+        if (id == null){
+            throw new CustomException("登录时未获取到id");
         }
-        return baseMapper.getName(uid);
+        return baseMapper.getSomeInfo(id);
     }
 }

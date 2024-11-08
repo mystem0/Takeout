@@ -16,6 +16,6 @@ import org.apache.ibatis.annotations.Select;
 @Mapper
 public interface EmployeeMapper extends BaseMapper<Employee> {
 
-    @Select("select name from reggie.employee where id = #{uid}")
-    String getName(Integer uid);
+    @Select("select id,name,username from reggie.employee where id = #{id}")
+    Employee getSomeInfo(Long id);
 }

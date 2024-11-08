@@ -36,7 +36,7 @@ public class EmployeeController {
      * @return
      */
     @PostMapping("/login")
-    public R<Long> login(HttpServletRequest request, @RequestBody Employee employee) {
+    public R<Employee> login(HttpServletRequest request, @RequestBody Employee employee) {
 
         //1、将页面提交的密码password进行md5加密处理
         String password = employee.getPassword();
@@ -60,19 +60,12 @@ public class EmployeeController {
         }
         //6、登录成功，将员工id存入Session
         request.getSession().setAttribute("employee", emp.getId());
-        //7、返回登录成功结果和当前登录员工的id
-        return R.success(emp.getId());
+        //根据用户id获取localStorage所需信息
+        Employee e = employeeService.getSomeInfo(emp.getId());
+        //7、返回登录成功结果
+        return R.success(e);
     }
 
-    @GetMapping("/getInfo")
-    public R<String> getInfo(@RequestParam String uid){
-        log.info(uid);
-        // 去除双引号
-        uid = uid.replace("\"", "");
-        int id = Integer.parseInt(uid);
-        String name = employeeService.getName(id);
-        return R.success(name);
-    }
     /**
      * 退出
      * 'url': '/employee/logout',
