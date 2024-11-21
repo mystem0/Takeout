@@ -83,6 +83,7 @@ public class DishController {
             //根据id查询分类对象
             Category category = categoryService.getById(categoryId);
 
+            //由于原始数据缺陷，有些菜品并没有分类名称
             if(category != null){
                 String categoryName = category.getName();
                 dishDto.setCategoryName(categoryName);

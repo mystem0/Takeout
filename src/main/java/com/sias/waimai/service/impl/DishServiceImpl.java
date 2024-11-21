@@ -42,11 +42,12 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
 
         Long dishId = dishDto.getId();//获取菜品id
         //保存菜品口味
-        List<DishFlavor> flavors = dishDto.getFlavors();
+        List<DishFlavor> flavors = dishDto.getFlavors();//获取 dishDto 对象中的 flavors 列表
+        //使用流式处理，给flavors中的每个口味对象设置菜品id属性
         flavors = flavors.stream().map((item) -> {
             item.setDishId(dishId);
             return item;
-        }).collect(Collectors.toList());
+        }).collect(Collectors.toList());//将处理后的列表收集并赋值给 flavors 变量。
 
         //保存菜品口味数据到菜品口味表dish_flavor
         dishFlavorService.saveBatch(flavors);

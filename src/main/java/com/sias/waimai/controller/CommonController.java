@@ -1,5 +1,6 @@
 package com.sias.waimai.controller;
 
+import com.sias.waimai.common.CustomException;
 import com.sias.waimai.pojo.R;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,18 +43,21 @@ public class CommonController {
         //file是一个临时文件，需要转存到指定位置，否则本次请求完成后临时文件会删除
         log.info("获取到上传的文件：{}", file.toString());
         String originalFilename = file.getOriginalFilename();//获取原始文件名。使用原始文件名遇见相同名字的文件会被覆盖
-        String suffix = originalFilename.substring(originalFilename.lastIndexOf("."));//从“.”开始截取文件名
-        String fileName = UUID.randomUUID().toString() + suffix;//动态拼接文件名：自动生成的UID + 后缀名
-        File dir = new File(basePath);//创建一个目录，判断当前目录是否存在。不存在--->创建当前目录
-        if (!dir.exists()) {
-            dir.mkdirs();
+        if (originalFilename != null) {
+            String suffix = originalFilename.substring(originalFilename.lastIndexOf("."));//从“.”开始截取文件名
+            String fileName = UUID.randomUUID().toString() + suffix;//动态拼接文件名：自动生成的UID + 后缀名
+            File dir = new File(basePath);//创建一个目录，判断当前目录是否存在。不存在--->创建当前目录
+            if (!dir.exists()) {
+                dir.mkdirs();
+            }
+            try {
+                file.transferTo(new File(basePath + fileName));//将图片从临时位置转存到指定路径
+            } catch (IOException e) {
+                throw new CustomException(e.getMessage());
+            }
+            return R.success(fileName);
         }
-        try {
-            file.transferTo(new File(basePath + fileName));//转存图片到指定路径
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return R.success(fileName);
+        return R.error("上传失败");
     }
 
     /**
@@ -83,7 +87,7 @@ public class CommonController {
             servletOutputStream.close();
             fileInputStream.close();
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new CustomException(e.getMessage());
         }
     }
 }

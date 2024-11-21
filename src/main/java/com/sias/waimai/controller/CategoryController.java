@@ -46,14 +46,15 @@ public class CategoryController {
      */
     @GetMapping("/page")
     public R<Page> page(int page, int pageSize) {
-        log.info("page={},pagesize={}", page, pageSize);
+        log.info("page={},pageSize={}", page, pageSize);
         //创建分页构造器
         Page<Category> page1 = new Page<>(page, pageSize);
+        //因为要根据sort排序，所以要实例化一个条件构造器
         //条件构造器
         LambdaQueryWrapper<Category> wrapper = new LambdaQueryWrapper<>();
-        //添加排序条件，根据sort进行排序
+        //添加排序条件，根据sort进行升序排序
         wrapper.orderByAsc(Category::getSort);
-        //分页查询
+        //分页查询  .page(分页构造器，条件构造器)
         categoryService.page(page1, wrapper);
         return R.success(page1);
     }
@@ -95,7 +96,8 @@ public class CategoryController {
     public R<List<Category>> list(Category category) {
         //条件构造器
         LambdaQueryWrapper<Category> wrapper = new LambdaQueryWrapper<>();
-        //添加条件
+        //添加查询条件,布尔类型的condition是eq方法是否执行的前提
+        //Category::getType确定查询哪一列，category.getType()确定值，相当于select * from Category where type=category.getType()
         wrapper.eq(category.getType() != null, Category::getType, category.getType());
         //排序条件
         wrapper.orderByAsc(Category::getSort).orderByDesc(Category::getUpdateTime);
