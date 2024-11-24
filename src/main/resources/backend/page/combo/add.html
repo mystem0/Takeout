@@ -278,7 +278,7 @@
           <i slot="prefix" class="el-input__icon el-icon-search" style="cursor: pointer" @click="seachHandle"></i>
         </el-input>
         <!-- <AddDish ref="adddish" :check-list="checkList" :seach-key="seachKey" @checkList="getCheckList" /> -->
-        
+
         <div class="addDishCon">
           <div class="leftCont">
             <div
@@ -347,7 +347,7 @@
             </div>
           </div>
         </div>
-        
+
         <span slot="footer" class="dialog-footer">
           <el-button @click="handleClose">取 消</el-button>
           <el-button type="primary" @click="addTableList">确 定</el-button>
@@ -540,11 +540,11 @@
                 prams.categoryId = this.ruleForm.idType
                 if(prams.setmealDishes.length < 1){
                   this.$message.error('请选择菜品！')
-                  return 
+                  return
                 }
                 if(!this.imageUrl){
                   this.$message.error('请上传套餐图片')
-                  return 
+                  return
                 }
                 // delete prams.dishList
                 if (this.actionType == 'add') {

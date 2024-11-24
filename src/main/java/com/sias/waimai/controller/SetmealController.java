@@ -91,7 +91,7 @@ public class SetmealController {
                 String categoryName = category.getName();
                 setmealDto.setCategoryName(categoryName);
             }
-            return setmealDto;
+            return setmealDto;//确保 map 操作的每一步都能返回一个转换后的 SetmealDto 对象
         }).collect(Collectors.toList());
 
         dtoPage.setRecords(list);
