@@ -10,6 +10,45 @@ spring:
       url: jdbc:mysql://localhost:3306/reggie?serverTimezone=Asia/Shanghai&useUnicode=true&characterEncoding=utf-8&zeroDateTimeBehavior=convertToNull&useSSL=false&allowPublicKeyRetrieval=true
       username: root
       password: root
+  mail:
+    #服务主机  qq邮箱为smtp.qq.com
+    host: smtp.qq.com
+    #发送邮件的账户
+    username: "1502493450@qq.com"
+    #授权码
+    password: "jgihybtmwzcwhdhb" # 授权码
+    #服务协议
+    protocol: smtp
+    # 编码集
+    default-encoding: UTF-8
+    properties:
+      mail:
+        smtp:
+          ssl:
+            enable: true #开启ssl
+
+  # 配置 redis数据库索引(默认为0)
+  redis:
+    database: 0
+    # redis服务器地址
+    host: 192.168.10.128
+    port: 6379
+    # redis 密码
+    password: 123321
+    # 连接池最大连接数 (使用负数表示没有限制)
+    jedis:
+      pool:
+        # 最大连接数
+        max-active: 8
+        # 最大阻塞等待时间
+        max-wait: -1
+        # 最带空闲连接
+        max-idle: 8
+        # 最小空闲连接
+        min-idle: 3
+    # 连接超时时间(毫秒)
+    timeout: 5000
+
 mybatis-plus:
   configuration:
     #在映射实体或者属性时，将数据库中表名和字段名中的下划线去掉，按照驼峰命名法映射 address_book ---> AddressBook

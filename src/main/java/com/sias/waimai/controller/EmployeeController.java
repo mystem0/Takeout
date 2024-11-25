@@ -60,7 +60,7 @@ public class EmployeeController {
         }
         //6、登录成功，将员工id存入Session
         request.getSession().setAttribute("employee", emp.getId());
-        //根据用户id获取localStorage所需信息
+        //根据员工id获取localStorage所需信息
         Employee e = employeeService.getSomeInfo(emp.getId());
         //7、返回登录成功结果
         return R.success(e);
