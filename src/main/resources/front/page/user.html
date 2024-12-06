@@ -33,14 +33,20 @@
             <div class="divLinks">
                 <div class="item" @click="toAddressPage">
                     <img src="../images/locations.png"/>
-                    <span>地址管理</span>
-                    <i class="el-icon-arrow-right"></i>
+                    <p>地址管理</p>
+                    <svg class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2102" width="16" height="16">
+                        <path d="M682.666667 490.666667l-256-256c-12.8-12.8-29.866667-12.8-42.666667 0s-12.8 29.866667 0 42.666666l234.666667
+                        234.666667L384 746.666667c-12.8 12.8-12.8 34.133333 0 46.933333 4.266667 4.266667 12.8 8.533333 21.333333
+                        8.533333s17.066667-4.266667 21.333334-8.533333l256-256c12.8-17.066667 12.8-34.133333 0-46.933333z" p-id="2103"></path></svg>
                 </div>
                 <div class="divSplit"></div>
                 <div class="item" @click="toOrderPage">
                     <img src="../images/orders.png"/>
-                    <span>历史订单</span>
-                    <i class="el-icon-arrow-right"></i>
+                    <p>历史订单</p>
+                    <svg class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="2102" width="16" height="16">
+                        <path d="M682.666667 490.666667l-256-256c-12.8-12.8-29.866667-12.8-42.666667 0s-12.8 29.866667 0 42.666666l234.666667
+                        234.666667L384 746.666667c-12.8 12.8-12.8 34.133333 0 46.933333 4.266667 4.266667 12.8 8.533333 21.333333
+                        8.533333s17.066667-4.266667 21.333334-8.533333l256-256c12.8-17.066667 12.8-34.133333 0-46.933333z" p-id="2103"></path></svg>
                 </div>
             </div>
             <div class="divOrders" v-if="order[0]">
@@ -117,12 +123,12 @@
                 toAddressPage(){
                     window.requestAnimationFrame(()=>{
                         window.location.href = '/front/page/address.html'
-                    })  
+                    })
                 },
                 toOrderPage(){
                     window.requestAnimationFrame(()=>{
                         window.location.href = '/front/page/order.html'
-                    }) 
+                    })
                 },
                 initData(){
                     this.getLatestOrder()
@@ -173,7 +179,7 @@
                     if(res.code === 1){
                         window.requestAnimationFrame(()=>{
                             window.location.href = '/front/index.html'
-                        }) 
+                        })
                     }else{
                         this.$notify({ type:'warning', message:res.msg});
                     }
@@ -183,10 +189,10 @@
                     if(res.code === 1){
                         window.requestAnimationFrame(()=>{
                             window.location.href = '/front/page/login.html'
-                        }) 
+                        })
                     }else{
                         this.$notify({ type:'warning', message:res.msg});
-                    }                
+                    }
                 }
             }
         })
