@@ -57,7 +57,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         MimeMessage message = mailSender.createMimeMessage();
         try {
             String code = String.valueOf(Math.random()).substring(2, 8);//随机生成一个验证码
-            log.info("验证码为:" + code);
+//            log.info("验证码为:" + code);
 //            MailSSLSocketFactory sslSocketFactory = new MailSSLSocketFactory();
 //            sslSocketFactory.setTrustAllHosts(true);
             //邮箱发送内容组成
@@ -70,6 +70,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             redisService.setMailCode(code);//将验证码存入redis
             return R.success("邮件已到达");
         }catch (MessagingException e){
+            log.error(e.getMessage());
             return R.error("邮件发送失败,请重试!");
         }
     }
@@ -124,7 +125,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public User login(UserDto dto) {
         if (redisService.getMailCode(dto.getCode()) == null){
-            throw new CustomException("验证码已过期");
+            throw new CustomException("验证码错误");
         }
         redisService.delMailCode(dto.getCode());
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
