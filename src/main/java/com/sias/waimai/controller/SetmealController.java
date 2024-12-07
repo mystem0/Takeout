@@ -113,6 +113,11 @@ public class SetmealController {
         return R.success("套餐数据删除成功");
     }
 
+    /**
+     * 移动端展示套餐数据
+     * @param setmeal
+     * @return
+     */
     @GetMapping("/list")
     public R<List<Setmeal>> list(Setmeal setmeal) {
         log.info("setmeal:{}", setmeal);
@@ -126,6 +131,12 @@ public class SetmealController {
         return R.success(setmealService.list(queryWrapper));
     }
 
+    /**
+     * 修改套餐状态
+     * @param ids
+     * @param setmeal
+     * @return
+     */
     @PostMapping("/status/0")
     public R<String> status(@RequestParam List<Long> ids,@RequestBody Setmeal setmeal) {
         log.info("当前套餐状态为{}");

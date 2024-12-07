@@ -33,8 +33,8 @@ import java.util.stream.Collectors;
 public class DishController {
     @Autowired
     private DishService dishService;
-//    @Autowired
-//    private DishFlavorService dishFlavorService;
+    @Autowired
+    private DishFlavorService dishFlavorService;
     @Autowired
     private CategoryService categoryService;
 
@@ -123,7 +123,7 @@ public class DishController {
      * @return
      */
     @GetMapping("/list")
-    public R<List<Dish>> list(Dish dish){
+    public R<List<DishDto>> list(Dish dish){
         //构造查询条件
         LambdaQueryWrapper<Dish> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(dish.getCategoryId() != null ,Dish::getCategoryId,dish.getCategoryId());
@@ -131,10 +131,35 @@ public class DishController {
         queryWrapper.eq(Dish::getStatus,1);
         //添加排序条件
         queryWrapper.orderByAsc(Dish::getSort).orderByDesc(Dish::getUpdateTime);
-
+        //菜品基本信息列表
         List<Dish> list = dishService.list(queryWrapper);
+        //菜品基本信息和口味信息
+        List<DishDto> dishDtoList = list.stream().map((item) -> {
+            DishDto dishDto = new DishDto();
+            //拷贝属性
+            BeanUtils.copyProperties(item,dishDto);
+            //获取分类id
+            Long categoryId = item.getCategoryId();
+            //根据分类id查询分类对象
+            Category category = categoryService.getById(categoryId);
+            if(category != null){
+                //获取分类名称
+                String categoryName = category.getName();
+                //赋值给dishDto
+                dishDto.setCategoryName(categoryName);
+            }
+            //当前菜品id
+            Long dishId = item.getId();
+            //通过当前菜品id查询对应的口味数据
+            LambdaQueryWrapper<DishFlavor> lambdaQueryWrapper= new LambdaQueryWrapper<>();
+            lambdaQueryWrapper.eq(DishFlavor::getDishId,dishId);
+            List<DishFlavor> dishFlavorList = dishFlavorService.list(lambdaQueryWrapper);
+            //赋值给dishDto
+            dishDto.setFlavors(dishFlavorList);
+            return dishDto;
+        }).collect(Collectors.toList());
 
-        return R.success(list);
+        return R.success(dishDtoList);
     }
 }
 
