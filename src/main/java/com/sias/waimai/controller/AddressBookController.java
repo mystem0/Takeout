@@ -84,4 +84,18 @@ public class AddressBookController {
         }
         return R.error("获取线程uid失败");
     }
+
+    /**
+     * 获取默认地址
+     * @return
+     */
+    @GetMapping("/default")
+    public R<AddressBook> getDefault() {
+        Long uid = BaseContext.getCurrentId();
+        LambdaQueryWrapper<AddressBook> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(AddressBook::getUserId,uid);
+        wrapper.eq(AddressBook::getIsDefault,1);
+        AddressBook one = addressBookService.getOne(wrapper);
+        return R.success(one);
+    }
 }
