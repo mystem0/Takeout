@@ -201,7 +201,6 @@
             axios.get('/category/listByType',{params:{type:value,page: this.page, pageSize: this.pageSize}}).then(res => {
               if (String(res.data.code) === '1') {
                 this.tableData = res.data.data.records
-                console.log(this.tableData)
                 this.counts = Number(res.data.data.total)
               } else {
                 this.$message.error(res.data.msg || '操作失败')

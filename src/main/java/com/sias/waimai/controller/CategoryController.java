@@ -108,6 +108,13 @@ public class CategoryController {
         return R.success(list);
     }
 
+    /**
+     * 根据类型查询
+     * @param page
+     * @param pageSize
+     * @param type
+     * @return
+     */
     @GetMapping("/listByType")
     public R<Page> listByType(int page,int pageSize,int type){
         log.info("page={},pageSize={},type={}",page,pageSize,type);
