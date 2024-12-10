@@ -2,6 +2,7 @@ package com.sias.waimai.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.sias.waimai.common.CustomException;
 import com.sias.waimai.pojo.Category;
 import com.sias.waimai.pojo.R;
 import com.sias.waimai.service.CategoryService;
@@ -105,5 +106,22 @@ public class CategoryController {
         List<Category> list = categoryService.list(wrapper);
         //返回
         return R.success(list);
+    }
+
+    @GetMapping("/listByType")
+    public R<Page> listByType(int page,int pageSize,int type){
+        log.info("page={},pageSize={},type={}",page,pageSize,type);
+        if (type != 0){
+            //构造分页器
+            Page<Category> page1 = new Page<>(page,pageSize);
+            //条件查询
+            LambdaQueryWrapper<Category> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(Category::getType,type);
+            //添加排序条件，根据sort进行升序排序
+            wrapper.orderByAsc(Category::getSort);
+            categoryService.page(page1,wrapper);
+            return R.success(page1);
+        }
+        return this.page(page,pageSize);
     }
 }
