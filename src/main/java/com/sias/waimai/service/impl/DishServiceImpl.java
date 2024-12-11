@@ -2,12 +2,14 @@ package com.sias.waimai.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.sias.waimai.dto.DishDto;
+import com.sias.waimai.mapper.SetmealDishMapper;
 import com.sias.waimai.pojo.Dish;
 import com.sias.waimai.mapper.DishMapper;
 import com.sias.waimai.pojo.DishFlavor;
 import com.sias.waimai.service.DishFlavorService;
 import com.sias.waimai.service.DishService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.sias.waimai.service.SetmealService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,10 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
 
     @Autowired
     private DishFlavorService dishFlavorService;
+    @Autowired
+    private SetmealDishMapper setmealDishMapper;
+    @Autowired
+    private SetmealService setmealService;
 
     /**
      * 新增菜品，同时保存对应的口味数据
@@ -95,5 +101,21 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
         }).collect(Collectors.toList());
 
         dishFlavorService.saveBatch(flavors);
+    }
+
+    /**
+     * 判断当前菜品是否关联套餐
+     * true表示没有关联套餐，可以停售
+     * false表示关联套餐，不可以停售
+     * @param id
+     * @return
+     */
+    public Boolean selectSetmealStatus(Long id) {
+        String setmealId = setmealDishMapper.getSetmealId(id);
+        if (setmealId != null) {
+            Integer status = setmealService.getById(setmealId).getStatus();
+            return status != 1;//true表示可以停售; false表示不可以停售
+        }
+        return true;//setmealid为空说明没有关联套餐，可以停售
     }
 }

@@ -21,4 +21,6 @@ public interface DishService extends IService<Dish> {
 
     //更新菜品信息，同时更新对应的口味信息
     void updateWithFlavor(DishDto dishDto);
+
+    Boolean selectSetmealStatus(Long id);
 }

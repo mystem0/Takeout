@@ -161,5 +161,44 @@ public class DishController {
 
         return R.success(dishDtoList);
     }
+
+    /**
+     * 批量起售
+     * @param ids
+     * @return
+     */
+    @PostMapping("/status/1")
+    public R<String> startStatus(@RequestParam List<Long> ids) {
+        log.info("要启售的菜品id为{}",ids);
+        //将id从ids中取出来
+        for (Long id : ids) {
+            //起售无需判断相关套餐状态
+            Dish dish = dishService.getById(id);
+            dish.setStatus(1);
+            dishService.updateById(dish);
+        }
+        return R.success("启售成功");
+    }
+
+    /**
+     * 批量停售
+     * @param ids
+     * @return
+     */
+    @PostMapping("/status/0")
+    public R<String> stopStatus(@RequestParam List<Long> ids) {
+        log.info("要停售的菜品id为{}",ids);
+        //将id从ids中取出来
+        for (Long id : ids) {
+            //判断这个菜品绑定的套餐是否已停售
+            if (!dishService.selectSetmealStatus(id)){
+                return R.error("菜品正在被起售的套餐使用，无法停售");
+            }
+            Dish dish = dishService.getById(id);
+            dish.setStatus(0);
+            dishService.updateById(dish);
+        }
+        return R.success("停售成功");
+    }
 }
 
