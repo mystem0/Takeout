@@ -3,6 +3,7 @@ package com.sias.waimai.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.sias.waimai.common.CustomException;
 import com.sias.waimai.dto.SetmealDto;
+import com.sias.waimai.mapper.DishMapper;
 import com.sias.waimai.pojo.Setmeal;
 import com.sias.waimai.mapper.SetmealMapper;
 import com.sias.waimai.pojo.SetmealDish;
@@ -36,6 +37,8 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
 
     @Autowired
     private SetmealDishService setmealDishService;
+    @Autowired
+    private DishMapper dishMapper;
     /**
      * 新增套餐，同时需要保存套餐和菜品的关联关系
      * @param setmealDto
@@ -95,7 +98,7 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
      * 删除图片
      * @param images
      */
-    private void deleteImages(List<String> images) {
+    public void deleteImages(List<String> images) {
         for (String image : images){
             File file = new File(image);
             if (file.exists()){
@@ -125,6 +128,9 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
         //添加新的菜品信息
         List<SetmealDish> setmealDishes = setmealDto.getSetmealDishes();
         setmealDishes = setmealDishes.stream().map((item) -> {
+            if (dishMapper.selectId(item.getDishId()) ==null){
+                throw new CustomException("菜品不存在");
+            }
             item.setSetmealId(setmealDto.getId());//给每一条菜品数据绑定套餐id
             return item;
         }).collect(Collectors.toList());

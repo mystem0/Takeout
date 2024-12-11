@@ -1,6 +1,7 @@
 package com.sias.waimai.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.sias.waimai.common.CustomException;
 import com.sias.waimai.dto.DishDto;
 import com.sias.waimai.mapper.SetmealDishMapper;
 import com.sias.waimai.pojo.Dish;
@@ -12,6 +13,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.sias.waimai.service.SetmealService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,12 +31,16 @@ import java.util.stream.Collectors;
 @Service
 public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements DishService {
 
+    @Value("${waimai.path}")
+    private String basePath;
     @Autowired
     private DishFlavorService dishFlavorService;
     @Autowired
     private SetmealDishMapper setmealDishMapper;
     @Autowired
     private SetmealService setmealService;
+    @Autowired
+    private DishMapper dishMapper;
 
     /**
      * 新增菜品，同时保存对应的口味数据
@@ -117,5 +123,40 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
             return status != 1;//true表示可以停售; false表示不可以停售
         }
         return true;//setmealid为空说明没有关联套餐，可以停售
+    }
+
+    /**
+     * 批量删除菜品，同时删除对应的口味数据
+     * @param ids
+     */
+    @Transactional
+    public void removeWithSetmeal(List<Long> ids) {
+        //判断当前菜品状态是否为1，是则抛出异常
+        for (Long id :ids){
+            Integer i = dishMapper.select(id, 1);
+            if (i > 0){
+                throw new CustomException("菜品正在售卖中，不能删除");
+            }
+        }
+        //判断菜品是否正在被套餐使用
+        for (Long id : ids){
+            Integer i = setmealDishMapper.select(id);
+            if (i > 0){
+                throw new CustomException("菜品正在被套餐使用，不能删除");
+            }
+        }
+        //删除菜品图片
+        List<Dish> list = this.listByIds(ids);
+        List<String> images = list.stream().map(item->{
+            String image = basePath + item.getImage();
+            return image;
+        }).collect(Collectors.toList());
+        setmealService.deleteImages(images);
+        //删除菜品表中的数据---dish
+        this.removeByIds(ids);
+        //删除口味表中的数据---dish_flavor
+        LambdaQueryWrapper<DishFlavor> lambdaQueryWrapper = new LambdaQueryWrapper<>();
+        lambdaQueryWrapper.in(DishFlavor::getDishId,ids);
+        dishFlavorService.remove(lambdaQueryWrapper);
     }
 }

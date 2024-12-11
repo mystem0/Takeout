@@ -3,6 +3,8 @@ package com.sias.waimai.mapper;
 import com.sias.waimai.pojo.Dish;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Select;
 
 /**
  * <p>
@@ -15,4 +17,9 @@ import org.apache.ibatis.annotations.Mapper;
 @Mapper
 public interface DishMapper extends BaseMapper<Dish> {
 
+    @Select("select * from reggie.dish where id = #{dishId}")
+    Dish selectId(Long dishId);
+
+    @Select("select count(*) from reggie.dish where id = #{id} and status = #{status}")
+    Integer select(@Param("id") Long id,@Param("status") Integer status);
 }

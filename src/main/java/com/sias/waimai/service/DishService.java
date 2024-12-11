@@ -4,6 +4,8 @@ import com.sias.waimai.dto.DishDto;
 import com.sias.waimai.pojo.Dish;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+
 /**
  * <p>
  * 菜品管理 服务类
@@ -23,4 +25,6 @@ public interface DishService extends IService<Dish> {
     void updateWithFlavor(DishDto dishDto);
 
     Boolean selectSetmealStatus(Long id);
+
+    void removeWithSetmeal(List<Long> ids);
 }

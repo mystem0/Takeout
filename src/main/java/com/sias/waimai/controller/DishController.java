@@ -200,5 +200,17 @@ public class DishController {
         }
         return R.success("停售成功");
     }
+
+    /**
+     * 批量删除菜品
+     * @param ids
+     * @return
+     */
+    @DeleteMapping
+    public R<String> delete(@RequestParam List<Long> ids){
+        log.info("要删除的菜品ids为{}",ids);
+        dishService.removeWithSetmeal(ids);
+        return R.success("菜品删除成功");
+    }
 }
 
