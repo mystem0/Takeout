@@ -6,10 +6,8 @@ import com.sias.waimai.common.CustomException;
 import com.sias.waimai.dto.UserDto;
 import com.sias.waimai.pojo.R;
 import com.sias.waimai.service.RedisService;
-import com.sun.mail.util.MailSSLSocketFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import com.sias.waimai.mapper.UserMapper;
 import com.sias.waimai.pojo.User;
@@ -25,8 +23,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.security.GeneralSecurityException;
 import java.text.MessageFormat;
+import java.util.HashMap;
 
 /**
  * @author li+
@@ -67,7 +65,9 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             helper.setTo(recipient);//设置邮件接收人
             helper.setFrom("英才招聘平台" + '<' + fromMail + '>');//设置邮件发件人信息
             mailSender.send(message);//发送邮件
-            redisService.setMailCode(code);//将验证码存入redis
+            HashMap<String, String> map = new HashMap<>();
+            map.put(recipient,code);
+            redisService.setMailCode(map);//将验证码存入redis
             return R.success("邮件已到达");
         }catch (MessagingException e){
             log.error(e.getMessage());
@@ -124,10 +124,15 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      */
     @Override
     public User login(UserDto dto) {
-        if (redisService.getMailCode(dto.getCode()) == null){
+        if (dto.getPhone() == null){
+            throw new CustomException("手机号为空");
+        }
+        String code = dto.getCode();
+        String mailCode = redisService.getMailCode(dto.getPhone());
+        if (mailCode == null || !mailCode.equals(code)){
             throw new CustomException("验证码错误");
         }
-        redisService.delMailCode(dto.getCode());
+        redisService.delMailCode(dto.getPhone());
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(User::getPhone,dto.getPhone());
         return this.baseMapper.selectOne(wrapper);
