@@ -6,6 +6,7 @@ import com.sias.waimai.dto.SetmealDto;
 import com.sias.waimai.pojo.Category;
 import com.sias.waimai.pojo.R;
 import com.sias.waimai.pojo.Setmeal;
+import com.sias.waimai.pojo.SetmealDish;
 import com.sias.waimai.service.CategoryService;
 import com.sias.waimai.service.SetmealDishService;
 import com.sias.waimai.service.SetmealService;
@@ -132,15 +133,76 @@ public class SetmealController {
     }
 
     /**
-     * 修改套餐状态
+     * 停售
      * @param ids
-     * @param setmeal
      * @return
      */
     @PostMapping("/status/0")
-    public R<String> status(@RequestParam List<Long> ids,@RequestBody Setmeal setmeal) {
-        log.info("当前套餐状态为{}");
-        setmealService.updateById(setmeal);
-        return R.success("修改成功");
+    public R<String> stopStatus(@RequestParam List<Long> ids) {
+        log.info("当前套餐状态为{}",ids);
+        //将id从ids中取出来
+        for (Long id : ids) {
+            Setmeal setmeal = setmealService.getById(id);
+            if (setmeal.getStatus() == 0){
+                return R.error("当前套餐状态为停售，无法再次停售");
+            }
+            setmeal.setStatus(0);
+            setmealService.updateById(setmeal);
+        }
+        return R.success("停售成功");
+    }
+
+    /**
+     * 启售
+     * @param ids
+     * @return
+     */
+    @PostMapping("/status/1")
+    public R<String> startStatus(@RequestParam List<Long> ids) {
+        log.info("当前套餐状态为{}",ids);
+        //将id从ids中取出来
+        for (Long id : ids) {
+            Setmeal setmeal = setmealService.getById(id);
+            if (setmeal.getStatus() == 1){
+                return R.error("当前套餐状态为启售，无法再次启售");
+            }
+            setmeal.setStatus(1);
+            setmealService.updateById(setmeal);
+        }
+        return R.success("启售成功");
+    }
+
+    /**
+     * 根据id查询套餐数据
+     * @param id
+     * @return
+     */
+    @GetMapping("/{id}")
+    public R<SetmealDto> get(@PathVariable Long id) {
+        Setmeal setmealServiceById = setmealService.getById(id);
+        Long id1 = setmealServiceById.getCategoryId();
+        SetmealDto dto = new SetmealDto();
+        Category categoryServiceById = categoryService.getById(id1);
+        dto.setCategoryName(categoryServiceById.getName());//补充套餐分类名称
+
+        LambdaQueryWrapper<SetmealDish> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(SetmealDish::getSetmealId, id);
+        List<SetmealDish> list = setmealDishService.list(wrapper);
+        dto.setSetmealDishes(list);//补充套餐菜品数据
+
+        BeanUtils.copyProperties(setmealServiceById, dto);
+        return R.success(dto);
+    }
+
+    /**
+     * 修改套餐
+     * @param setmealDto
+     * @return
+     */
+    @PutMapping
+    public R<String> update(@RequestBody SetmealDto setmealDto) {
+        log.info("套餐信息：{}", setmealDto);
+        setmealService.updateWithDish(setmealDto);
+        return R.success("修改套餐成功");
     }
 }

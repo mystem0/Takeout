@@ -74,4 +74,24 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
         //删除关系表中的数据----setmeal_dish
         setmealDishService.remove(lambdaQueryWrapper);
     }
+
+    /**
+     * 修改套餐
+     * @param setmealDto
+     */
+    @Transactional
+    public void updateWithDish(SetmealDto setmealDto) {
+        this.updateById(setmealDto);//更新套餐基本信息
+        //通过套餐id删除当前套餐的菜品信息
+        LambdaQueryWrapper<SetmealDish> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(SetmealDish::getSetmealId,setmealDto.getId());
+        setmealDishService.remove(wrapper);
+        //添加新的菜品信息
+        List<SetmealDish> setmealDishes = setmealDto.getSetmealDishes();
+        setmealDishes = setmealDishes.stream().map((item) -> {
+            item.setSetmealId(setmealDto.getId());//给每一条菜品数据绑定套餐id
+            return item;
+        }).collect(Collectors.toList());
+        setmealDishService.saveBatch(setmealDishes);
+    }
 }
