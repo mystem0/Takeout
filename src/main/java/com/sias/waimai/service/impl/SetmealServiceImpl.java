@@ -9,10 +9,13 @@ import com.sias.waimai.pojo.SetmealDish;
 import com.sias.waimai.service.SetmealDishService;
 import com.sias.waimai.service.SetmealService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,8 +27,13 @@ import java.util.stream.Collectors;
  * @author li
  * @since 2023-05-19
  */
+@Slf4j
 @Service
 public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> implements SetmealService {
+
+    @Value("${waimai.path}")
+    private String basePath;
+
     @Autowired
     private SetmealDishService setmealDishService;
     /**
@@ -65,6 +73,14 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
             throw new CustomException("套餐正在售卖中，不能删除");
         }
 
+        List<Setmeal> list = this.listByIds(ids);
+        List<String> images = list.stream().map(item->{
+            String image = basePath + item.getImage();
+            return image;
+        }).collect(Collectors.toList());
+        // 删除图片
+        deleteImages(images);
+
         //如果可以删除，先删除套餐表中的数据---setmeal
         this.removeByIds(ids);
 
@@ -73,6 +89,26 @@ public class SetmealServiceImpl extends ServiceImpl<SetmealMapper, Setmeal> impl
         lambdaQueryWrapper.in(SetmealDish::getSetmealId,ids);
         //删除关系表中的数据----setmeal_dish
         setmealDishService.remove(lambdaQueryWrapper);
+    }
+
+    /**
+     * 删除图片
+     * @param images
+     */
+    private void deleteImages(List<String> images) {
+        for (String image : images){
+            File file = new File(image);
+            if (file.exists()){
+                if (file.delete()){
+                    log.info("Delete image successfully: {}", image);
+                }else {
+                    log.error("Failed to delete image: {}", image);
+                }
+            } else {
+                // 图片不存在，记录日志
+                log.warn("Image does not exist: {}", image);
+            }
+        }
     }
 
     /**

@@ -16,7 +16,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -143,9 +142,6 @@ public class SetmealController {
         //将id从ids中取出来
         for (Long id : ids) {
             Setmeal setmeal = setmealService.getById(id);
-            if (setmeal.getStatus() == 0){
-                return R.error("当前套餐状态为停售，无法再次停售");
-            }
             setmeal.setStatus(0);
             setmealService.updateById(setmeal);
         }
@@ -163,9 +159,6 @@ public class SetmealController {
         //将id从ids中取出来
         for (Long id : ids) {
             Setmeal setmeal = setmealService.getById(id);
-            if (setmeal.getStatus() == 1){
-                return R.error("当前套餐状态为启售，无法再次启售");
-            }
             setmeal.setStatus(1);
             setmealService.updateById(setmeal);
         }
