@@ -2,6 +2,7 @@ package com.sias.waimai.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.sias.waimai.common.BaseContext;
 import com.sias.waimai.pojo.Employee;
 import com.sias.waimai.pojo.R;
 import com.sias.waimai.service.EmployeeService;
@@ -87,12 +88,11 @@ public class EmployeeController {
      * method: 'post',
      * data: { ...params }
      *
-     * @param request
      * @param employee
      * @return
      */
     @PostMapping
-    public R<String> save(HttpServletRequest request, @RequestBody Employee employee) {
+    public R<String> save(@RequestBody Employee employee) {
         log.info("新增员工的信息：{}", employee.toString());
         //设置初始密码123456，需要进行md5加密处理
         employee.setPassword(DigestUtils.md5DigestAsHex("123456".getBytes()));
@@ -119,8 +119,15 @@ public class EmployeeController {
      * @return
      */
     @GetMapping("/page")
-    public R<Page> list(int page, int pageSize, String name) {
+    public R<Page> list(int page, int pageSize, String name,HttpServletRequest request) {
         log.info("page={},pageSize={},name={}", page, pageSize, name);
+        //查询当前用户是否再是合法账户
+        Employee employee = employeeService.getById(BaseContext.getCurrentId());
+        if (employee == null || employee.getStatus() == 0){
+            //清除session
+            request.getSession().removeAttribute("employee");
+            return R.error("非法账户，请重新登录");
+        }
         //构造分页器
         Page page1 = new Page(page, pageSize);
         //构造条件构造器
