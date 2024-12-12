@@ -102,4 +102,42 @@ public class AddressBookController {
         AddressBook one = addressBookService.getOne(wrapper);
         return R.success(one);
     }
+
+    /**
+     * 修改地址前，根据id查询地址
+     * @param id 地址id
+     * @return AddressBook
+     */
+    @GetMapping("/{id}")
+    public R<AddressBook> getById(@PathVariable Long id){
+        AddressBook addressBook = addressBookService.getById(id);
+        if (addressBook == null){
+            return R.error("地址不存在");
+        }
+        return R.success(addressBook);
+    }
+
+    /**
+     * 修改地址
+     * @param addressBook 修改后的地址对象
+     * @return 修改结果
+     */
+    @PutMapping
+    public R<String> update(@RequestBody AddressBook addressBook){
+        if (addressBookService.updateById(addressBook)){
+            return R.success("修改成功");
+        }
+        return R.error("修改失败");
+    }
+
+    /**
+     * 批量删除地址
+     * @param ids 地址id集合
+     * @return 删除结果
+     */
+    @DeleteMapping
+    public R<String> delete(@RequestParam List<Long> ids){
+        addressBookService.removeWithOrder(ids);
+        return R.success("删除成功");
+    }
 }

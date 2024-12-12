@@ -131,17 +131,15 @@ public class DishServiceImpl extends ServiceImpl<DishMapper, Dish> implements Di
      */
     @Transactional
     public void removeWithSetmeal(List<Long> ids) {
-        //判断当前菜品状态是否为1，是则抛出异常
         for (Long id :ids){
+            //判断当前菜品状态是否为1，是则抛出异常
             Integer i = dishMapper.select(id, 1);
             if (i > 0){
                 throw new CustomException("菜品正在售卖中，不能删除");
             }
-        }
-        //判断菜品是否正在被套餐使用
-        for (Long id : ids){
-            Integer i = setmealDishMapper.select(id);
-            if (i > 0){
+            //判断菜品是否正在被套餐使用
+            Integer d = setmealDishMapper.select(id);
+            if (d > 0){
                 throw new CustomException("菜品正在被套餐使用，不能删除");
             }
         }
