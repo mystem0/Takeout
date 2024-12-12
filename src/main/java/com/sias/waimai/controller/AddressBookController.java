@@ -50,12 +50,16 @@ public class AddressBookController {
      */
     @PostMapping
     public R<AddressBook> save(@RequestBody AddressBook addressBook){
-        Long userId = BaseContext.getCurrentId();
-        addressBook.setUserId(String.valueOf(userId));
-//        log.info("新增地址：{}",addressBook);
-        addressBookService.save(addressBook);
+        Long userId = BaseContext.getCurrentId();//获取线程id
         LambdaQueryWrapper<AddressBook> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(AddressBook::getUserId,userId);
+        wrapper.eq(AddressBook::getUserId,userId);//设置公共查询条件
+        //判断是否为第一个地址
+        List<AddressBook> list = addressBookMapper.selectList(wrapper);
+        if (list.isEmpty()){
+            addressBook.setIsDefault(1);//设为默认地址
+        }
+        addressBook.setUserId(String.valueOf(userId));//设置用户id
+        addressBookService.save(addressBook);//保存地址
         wrapper.eq(AddressBook::getPhone,addressBook.getPhone());
         AddressBook one = addressBookMapper.selectOne(wrapper);
         if (one == null){
