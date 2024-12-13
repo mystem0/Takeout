@@ -73,4 +73,15 @@ public class UserController {
         }
         return R.error("登录失败,未成功保存至数据库，请重新注册");
     }
+
+    /**
+     * 退出登录
+     * @param request
+     * @return
+     */
+    @PostMapping("/loginout")
+    public R<String> loginout(HttpServletRequest request){
+        request.getSession().removeAttribute("user");
+        return R.success("退出成功");
+    }
 }
