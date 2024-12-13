@@ -7,6 +7,7 @@ import com.sias.waimai.dto.OrdersDto;
 import com.sias.waimai.pojo.*;
 import com.sias.waimai.service.OrderDetailService;
 import com.sias.waimai.service.OrdersService;
+import com.sias.waimai.service.ShoppingCartService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,8 @@ public class OrdersController {
     private OrdersService ordersService;
     @Autowired
     private OrderDetailService orderDetailService;
+    @Autowired
+    private ShoppingCartService shoppingCartService;
 
     /**
      * 用户下单支付
@@ -77,5 +80,17 @@ public class OrdersController {
         }).collect(Collectors.toList());
         page2.setRecords(list);
         return R.success(page2);
+    }
+
+    /**
+     * 再来一单
+     * @param orders
+     * @return
+     */
+    @PostMapping("/again")
+    public R<String> again(@RequestBody Orders orders){
+        List<OrderDetail> details = orderDetailService.getByOrderId(orders.getId());
+        shoppingCartService.saveAgain(details);
+        return R.success("再来一单成功");
     }
 }
