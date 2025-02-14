@@ -14,4 +14,7 @@ public interface UserMapper extends BaseMapper<User> {
 
     @Select("select id,name,phone,sex,status from reggie.user where id = #{id}")
     User selectInfo(Long id);
+
+    @Select("select name from reggie.user where id = #{userId}")
+    String getIdToName(Long userId);
 }

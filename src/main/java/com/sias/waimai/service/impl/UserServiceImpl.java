@@ -7,6 +7,7 @@ import com.sias.waimai.dto.UserDto;
 import com.sias.waimai.pojo.R;
 import com.sias.waimai.service.RedisService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import com.sias.waimai.mapper.UserMapper;
@@ -25,6 +26,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.MessageFormat;
 import java.util.HashMap;
+import java.util.Objects;
 
 /**
  * @author li+
@@ -41,6 +43,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     JavaMailSender mailSender;
     @Resource
     RedisService redisService;
+    @Autowired
+    private UserMapper userMapper;
 
     /**
      * 发送邮件
@@ -128,13 +132,28 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new CustomException("手机号为空");
         }
         String code = dto.getCode();
+        // TODO 线上部署时放开
         String mailCode = redisService.getMailCode(dto.getPhone());
         if (mailCode == null || !mailCode.equals(code)){
             throw new CustomException("验证码错误");
         }
         redisService.delMailCode(dto.getPhone());
+        // TODO 本地开发时放开,使用000000作为固定验证码，免除本地验证码频繁获取
+//        if (!Objects.equals(code, "000000")){
+//            throw new CustomException("验证码错误");
+//        }
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(User::getPhone,dto.getPhone());
         return this.baseMapper.selectOne(wrapper);
+    }
+
+    /**
+     * 根据id获取用户名
+     * @param userId
+     * @return
+     */
+    @Override
+    public String getIdToName(Long userId) {
+        return userMapper.getIdToName(userId);
     }
 }

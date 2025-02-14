@@ -16,4 +16,6 @@ public interface UserService extends IService<User> {
     R<String> sendMsg(String email);
 
     User login(UserDto dto);
+
+    String getIdToName(Long userId);
 }

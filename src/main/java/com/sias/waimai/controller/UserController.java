@@ -62,6 +62,7 @@ public class UserController {
         }
         //用户不存在
         dto.setStatus(1);
+        dto.setName("林之迷");//设置默认用户名
         userMapper.insert(dto);//插入数据
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(User::getPhone,dto.getPhone()).eq(User::getStatus,1);
